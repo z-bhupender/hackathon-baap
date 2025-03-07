@@ -1,0 +1,2 @@
+export const GET_CHAT_BOT_DATA = "GET_CHAT_BOT_DATA";
+export const SET_CHATBOT_DATA = "SET_CHATBOT_DATA";
