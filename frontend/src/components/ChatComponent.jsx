@@ -1,98 +1,109 @@
-import React, { useState, useRef } from "react";
-import styles from "./ChatBotComponent.module.css";
-import { FaSearch } from "react-icons/fa"; // Importing search icon
+import React, { useState, useRef, useEffect } from "react";
+import styles from "./ChatBot.module.css";
+import { FaSearch, FaPaperclip, FaSmile, FaUser, FaRobot } from "react-icons/fa";
+import { use } from "react";
+import { useDispatch } from "react-redux";
 
-const ChatBotComponent = () => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+const ChatBot = () => {
+  const dispatch = useDispatch();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("chat");
+  const [messages, setMessages] = useState([
+    { text: "Hello! How can I help you?", sender: "bot", timestamp: new Date() },
+  ]);
+  const [input, setInput] = useState("");
   const fileInputRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
 
-    const userMessage = { sender: "User", content: inputText };
-    const botMessage = { sender: "Chat", content: "I received your message!" };
+  useEffect(()=>{
+    dispatch(getChatBotData("hhhhh"))
+  },[])
 
-    setMessages([...messages, userMessage, botMessage]);
-    setInputText("");
+  const toggleChatBox = () => setIsOpen(!isOpen);
+
+  const sendMessage = () => {
+    if (!input.trim()) return;
+
+    const newMessage = { text: input, sender: "user", timestamp: new Date() };
+    setMessages([...messages, newMessage]);
+    setInput("");
+
+    setTimeout(() => {
+      const botReply = { text: "I'm here to assist you!", sender: "bot", timestamp: new Date() };
+      setMessages((prev) => [...prev, botReply]);
+    }, 1000);
   };
 
-  const handleEmojiSelect = (emoji) => {
-    setInputText((prev) => prev + emoji);
-    setShowEmojiPicker(false);
-  };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const fileMessage = {
-        sender: "User",
-        content: `📎 Sent a file: ${file.name}`,
-      };
+  const handleFileChange = (event) => {
+    const uploadedFile = event.target.files[0];
+    if (uploadedFile) {
+      const fileMessage = { text: `📎 ${uploadedFile.name}`, sender: "user", timestamp: new Date() };
       setMessages([...messages, fileMessage]);
     }
   };
 
+  const addEmoji = (emoji) => setInput(input + emoji);
+
+  const formatTimestamp = (timestamp) => {
+    return new Date(timestamp).toLocaleString();
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div className={styles.wrapper}>
-      {/* Search Button to Open Chat */}
-      {!isChatOpen && (
-        <button className={styles.searchButton} onClick={() => setIsChatOpen(true)}>
-          <FaSearch className={styles.searchIcon} /> Search Chat
+    <div className={styles.chatContainer}>
+      {!isOpen && (
+        <button className={styles.searchButton} onClick={toggleChatBox}>
+          <FaSearch className={styles.searchIcon} /> Search
         </button>
       )}
 
-      {/* Chat Box */}
-      {isChatOpen && (
-        <div className={styles.container}>
-          {/* Header */}
-          <div className={styles.header}>
-            <span>Chat Bot</span>
-            <button onClick={() => setIsChatOpen(false)} className={styles.closeButton}>✖</button>
-          </div>
+      {isOpen && (
+        <div className={styles.chatBox}>
+          <div className={styles.heading}>{activeTab === "chat" ? "Chat Box" : "Help Box"}</div>
 
-          {/* Chat Display */}
-          <div className={styles.chatBox}>
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`${styles.message} ${
-                  msg.sender === "User" ? styles.userMessage : styles.botMessage
-                }`}
-              >
-                <strong>{msg.sender}: </strong> {msg.content}
-              </div>
-            ))}
-          </div>
-
-          {/* Input Area */}
-          <div className={styles.inputArea}>
-            <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}>😊</button>
-            {showEmojiPicker && (
-              <div className={styles.emojiPicker}>
-                {["😀", "😂", "😍", "😎", "🤔", "😢", "👏"].map((emoji) => (
-                  <span
-                    key={emoji}
-                    onClick={() => handleEmojiSelect(emoji)}
-                    className={styles.emoji}
-                  >
-                    {emoji}
-                  </span>
+          {activeTab === "chat" && (
+            <div className={styles.chatContent}>
+              <div className={styles.messages}>
+                {messages.map((msg, index) => (
+                  <div key={index} className={`${styles.messageWrapper} ${msg.sender === "user" ? styles.userWrapper : styles.botWrapper}`}>
+                    {msg.sender === "user" ? <FaUser className={styles.userIcon} /> : <FaRobot className={styles.botIcon} />}
+                    <div className={`${styles.message} ${msg.sender === "user" ? styles.userMessage : styles.botMessage}`}>
+                      {msg.text}
+                      <div className={styles.timestamp}>{formatTimestamp(msg.timestamp)}</div>
+                    </div>
+                  </div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
-            )}
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Type a message..."
-              className={styles.input}
-            />
-            <input type="file" onChange={handleFileUpload} ref={fileInputRef} style={{ display: "none" }} />
-            <button onClick={() => fileInputRef.current.click()}>📎</button>
-            <button onClick={handleSend}>Send</button>
+
+              <div className={styles.inputArea}>
+                <FaPaperclip className={styles.icon} onClick={() => fileInputRef.current.click()} />
+                <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
+                <FaSmile className={styles.icon} onClick={() => addEmoji("😊")} />
+                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." className={styles.input} />
+                <button onClick={sendMessage} className={styles.sendButton}>Send</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "help" && (
+            <div className={styles.helpContent}>
+              <p>Need help? Check out these resources:</p>
+              <ul>
+                <li><a href="https://example.com/help1" target="_blank" rel="noopener noreferrer">Help Center</a></li>
+                <li><a href="https://example.com/contact" target="_blank" rel="noopener noreferrer">Contact Support</a></li>
+              </ul>
+            </div>
+          )}
+
+          <div className={styles.tabs}>
+            <button className={activeTab === "chat" ? styles.activeTab : styles.tab} onClick={() => setActiveTab("chat")}>Chat</button>
+            <button className={activeTab === "help" ? styles.activeTab : styles.tab} onClick={() => setActiveTab("help")}>Help</button>
           </div>
         </div>
       )}
@@ -100,4 +111,4 @@ const ChatBotComponent = () => {
   );
 };
 
-export default ChatBotComponent;
+export default ChatBot;
