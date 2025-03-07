@@ -46,26 +46,17 @@ export async function search(req, res) {
         $vectorSearch: {
           queryVector: embeddings,
           path: "title_embedding",
-          numCandidates: 100,
+          numCandidates: 30, // Reduce from 100 → 30
           limit: 5,
           index: "default",
         },
       },
-      {
-        $set: { score: { $meta: "vectorSearchScore" } },
-      },
-      {
-        $match: {
-          score: { $gte: 0.91 },
-        },
-      },
-      {
-        $sort: { score: -1 },
-      },
-      {
-        $limit: 3,
-      },
+      { $set: { score: { $meta: "vectorSearchScore" } } },
+      { $match: { score: { $gte: 0.91 } } },
+      { $sort: { score: -1 } },
+      { $limit: 3 },
     ]);
+    
 
     if (helps.length === 0) {
       return res.status(404).json({
