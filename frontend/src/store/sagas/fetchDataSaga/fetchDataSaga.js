@@ -1,20 +1,27 @@
 import { put, takeLatest } from "redux-saga/effects";
-import axios from "../../../utils/axiosUtilsV2/axiosUtilsV2";
 import { GET_CHAT_BOT_DATA } from "../../actions/types";
+import { setChatBotData } from "../../actions/chatBotActions/chatBotactions";
 
 function* getChatBotData(action) {
   try {
-    let url = "p:calibration-assignment/create-calibration-assignment";
+    const url = "https://hackathon-baap.onrender.com/query";
 
-    const axiosRes = yield axios.post(url, { ...action.payload });
-    const response = axiosRes.data;
+    const response = yield fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(action.payload),
+    });
 
-    if (response.success && response.code === 200) {
-      yield put(getAssignmentStatus(1));
+    const data = yield response.json();
+
+    if (data.success && data.code === 200) {
+      yield put(setChatBotData(1));
     }
-    if (response.success === false) {
-    }
-  } catch (e) {}
+  } catch (error) {
+    console.error("API call failed:", error);
+  }
 }
 
 function* fetchDataSaga() {
