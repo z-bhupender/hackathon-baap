@@ -1,8 +1,8 @@
-import DataTypes from "sequelize";
+const { DataTypes } = require("sequelize");
 const sequelize = require("../database/mysql");
 
-export const CallMetaData = sequelize.define(
-  "call_meta_data",
+const CallMetaData = sequelize.define(
+  "CallMetaData",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -42,7 +42,15 @@ export const CallMetaData = sequelize.define(
     },
   },
   {
-    timestamps: true,
-    tableName: "users",
+    tableName: "call_meta_data",
+    timestamps: false,
+    indexes: [
+      {
+        name: "brand_id_index",
+        fields: ["brand_id"],
+      },
+    ],
   }
 );
+
+module.exports = CallMetaData;
