@@ -8,4 +8,8 @@ export const mongoCredentials = {
   cluster: process.env.MONGO_CLUSTER,
 };
 
-export const hf_key = process.env.HUGGING_FACE_KEY;
+export const huggingFaceKey = process.env.HUGGING_FACE_KEY;
+
+export const openaiCredentials = {
+
+}
