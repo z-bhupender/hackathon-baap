@@ -91,7 +91,7 @@ export default function ChatBot() {
                     </div>
                   )}
                   <div
-                    className={`p-2 rounded ${
+                    className={`p-2 w-70 rounded ${
                       msg.sender === "user"
                         ? "bg-primary text-white border"
                         : "bg-light border"
