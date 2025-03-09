@@ -1,7 +1,7 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../db/mysql");
+import DataTypes from "sequelize";
+const sequelize = require("../database/mysql");
 
-const CallMetaData = sequelize.define(
+export const CallMetaData = sequelize.define(
   "call_meta_data",
   {
     id: {
@@ -46,5 +46,3 @@ const CallMetaData = sequelize.define(
     tableName: "users",
   }
 );
-
-module.exports = CallMetaData;

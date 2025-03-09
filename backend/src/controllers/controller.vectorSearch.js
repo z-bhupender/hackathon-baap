@@ -1,4 +1,4 @@
-import Help from "../models/helpModel.js";
+import Help from "../models/model.help.js";
 import { huggingFaceKey } from "../constants/constants.js";
 import { HfInference } from "@huggingface/inference";
 
@@ -9,6 +9,12 @@ const getEmbedding = (text) => {
     model: "BAAI/bge-large-en-v1.5",
     inputs: text,
     provider: "hf-inference",
+  });
+};
+
+const toTitleCase = (str) => {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 };
 
@@ -56,7 +62,6 @@ export async function search(req, res) {
       { $sort: { score: -1 } },
       { $limit: 3 },
     ]);
-    
 
     if (helps.length === 0) {
       return res.status(404).json({
@@ -151,10 +156,11 @@ export async function list(_, res) {
     let helps = await Help.find({}).select("title content module -_id");
 
     let groupedHelps = helps.reduce((acc, help) => {
-      if (!acc[help.module]) {
-        acc[help.module] = [];
+      let module_name = toTitleCase(help.module.replaceAll("_", " "));
+      if (!acc[module_name]) {
+        acc[module_name] = [];
       }
-      acc[help.module].push({
+      acc[module_name].push({
         title: help.title,
         content: help.content,
       });

@@ -1,5 +1,5 @@
-const winston = require("winston");
-const config = require("../config");
+import winston from "winston";
+import { env } from "../constants/constants";
 
 const levels = {
   error: 0,
@@ -8,10 +8,7 @@ const levels = {
   debug: 3,
 };
 
-const level = () => {
-  const env = config.app.env || "development";
-  return env === "development" ? "debug" : "info";
-};
+const level = () => (env === "development" ? "debug" : "info");
 
 const format = winston.format.combine(
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
@@ -26,11 +23,9 @@ const transports = [
   new winston.transports.File({ filename: "logs/combined.log" }),
 ];
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   level: level(),
   levels,
   format,
   transports,
 });
-
-module.exports = logger;

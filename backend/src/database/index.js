@@ -1,4 +1,4 @@
-const sequelize = require("./mysql");
+const sequelize = require("../db/mysql");
 const logger = require("../utils/logger");
 
 // Test connection

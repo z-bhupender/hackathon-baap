@@ -1,7 +1,9 @@
-import baseRouter from "./baseRouter.js";
-import searchRouter from "./searchRouter.js";
+import baseRouter from "./route.base.js";
+import vectorRouter from "./route.vector.js";
+import functionCallRouter from "./route.functionCall.js";
 
 export const configureRoutes = (app) => {
-  app.use("/about", baseRouter);
-  app.use("", searchRouter);
+  app.use("/", baseRouter);
+  app.use("/vector", vectorRouter);
+  app.use("/function-call", functionCallRouter);
 };
