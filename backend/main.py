@@ -1,12 +1,6 @@
-# make a fastapi template
-from fastapi import FastAPI
+import uvicorn
+from src import App
 
-app = FastAPI()
+app = App()
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="localhost", port=8000)
+uvicorn.run(app, host="localhost", port=8000)
