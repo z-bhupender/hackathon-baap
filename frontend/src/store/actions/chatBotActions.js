@@ -1,4 +1,4 @@
-import { GET_CHAT_BOT_DATA, SET_CHATBOT_DATA } from "../types";
+import { GET_CHAT_BOT_DATA, SET_CHATBOT_DATA } from "./types";
 
 export const getChatBotData = (obj) => {
   return {

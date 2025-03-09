@@ -1,10 +1,14 @@
 import { put, takeLatest } from "redux-saga/effects";
-import { GET_CHAT_BOT_DATA } from "../../actions/types";
-import { setChatBotData } from "../../actions/chatBotActions/chatBotactions";
+import { GET_CHAT_BOT_DATA } from "../actions/types";
+import { API_HOST_URL } from "../../constants/constants";
+import { setChatBotData } from "../actions/chatBotActions";
 
 function* getChatBotData(action) {
   try {
-    const url = "https://hackathon-baap.onrender.com/query";
+    const url = API_HOST_URL + "/vector/query-helps";
+
+    console.log("URL: ", url);
+    
 
     const response = yield fetch(url, {
       method: "POST",
@@ -24,8 +28,6 @@ function* getChatBotData(action) {
   }
 }
 
-function* fetchDataSaga() {
+export default function* fetchDataSaga() {
   yield takeLatest(GET_CHAT_BOT_DATA, getChatBotData);
 }
-
-export default fetchDataSaga;

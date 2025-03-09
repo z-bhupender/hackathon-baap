@@ -12,7 +12,7 @@ import { RiHome6Fill } from "react-icons/ri";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 
 import { useDispatch } from "react-redux";
-import { getChatBotData } from "../store/actions/chatBotActions/chatBotactions";
+import { getChatBotData } from "../store/actions/chatBotActions";
 
 const ChatBot = () => {
   const dispatch = useDispatch();
@@ -30,9 +30,6 @@ const ChatBot = () => {
   // const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    dispatch(getChatBotData(input));
-  }, []);
 
   const toggleChatBox = () => setIsOpen(!isOpen);
 
