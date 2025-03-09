@@ -1,8 +1,8 @@
 import Help from "../models/helpModel.js";
-import { hf_key } from "../constants/constants.js";
+import { huggingFaceKey } from "../constants/constants.js";
 import { HfInference } from "@huggingface/inference";
 
-const client = new HfInference(hf_key);
+const client = new HfInference(huggingFaceKey);
 
 const getEmbedding = (text) => {
   return client.featureExtraction({
