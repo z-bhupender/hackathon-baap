@@ -1,7 +1,9 @@
-import { UserMetaName } from "../models/model.userMetaNames.js";
-import { CallMetaData } from "../models/model.callMetaData.js";
-import { CreateSkillDevelopmentPlan } from "../models/model.createSkillDevPlan.js";
-import UserSkillDevPlanMapping from "../models/model.userSkillDevPlanMapping.js";
+import {
+  UserMetaNameModel,
+  CallMetaDataModel,
+  CreateSkillDevelopmentPlanModel,
+  UserSkillDevPlanMappingModel,
+} from "../models/index.js";
 import { Op } from "sequelize";
 
 export async function getDevPlan(
@@ -11,7 +13,7 @@ export async function getDevPlan(
   brandId = 40
 ) {
   try {
-    const results = await UserSkillDevPlanMapping.findAll({
+    const results = await UserSkillDevPlanMappingModel.findAll({
       attributes: [
         "id",
         "user_plan_display_name",
@@ -21,7 +23,7 @@ export async function getDevPlan(
       ],
       include: [
         {
-          model: CreateSkillDevelopmentPlan,
+          model: CreateSkillDevelopmentPlanModel,
           as: "createSkillDevelopmentPlan",
           attributes: [],
           where: {
@@ -51,11 +53,11 @@ export async function getCalls(agentName, startDate, endDate, brandId = 40) {
     const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
     const endTimestamp = Math.floor(new Date(endDate).getTime() / 1000);
 
-    const results = await CallMetaData.findAll({
+    const results = await CallMetaDataModel.findAll({
       attributes: ["callid", ["_starttime", "call_date"]],
       include: [
         {
-          model: UserMetaName,
+          model: UserMetaNameModel,
           as: "agent",
           where: {
             brand_id: brandId,
