@@ -1,50 +1,45 @@
+import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useRef, useEffect } from "react";
-import styles from "./ChatBot.module.css";
-import {
-  FaSearch,
-  FaPaperclip,
-  FaSmile,
-  FaUser,
-  FaRobot,
-} from "react-icons/fa";
-import { IoSend, IoChatbubbleEllipsesSharp } from "react-icons/io5";
-import { RiHome6Fill } from "react-icons/ri";
-import { IoIosHelpCircleOutline } from "react-icons/io";
-
-import { useDispatch } from "react-redux";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { getChatBotData } from "../store/actions/chatBotActions";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
 
-const ChatBot = () => {
+export default function ChatBot() {
   const dispatch = useDispatch();
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("chat");
-  const [messages, setMessages] = useState([
-    {
-      text: "Hello! How can I help you?",
-      sender: "bot",
-      timestamp: new Date(),
-    },
-  ]);
-  const [input, setInput] = useState("");
-  // const fileInputRef = useRef(null);
-  const messagesEndRef = useRef(null);
+  const messagesEnd = useRef(null);
 
+  const [state, setState] = useState({
+    isChatBoxOpen: false,
+    chatBoxActiveTab: "chat",
+    message: "",
+    messageContext: [
+      {
+        text: "Hello! How can I help you?",
+        sender: "bot",
+        timestamp: new Date(),
+      },
+    ],
+  });
 
-  const toggleChatBox = () => setIsOpen(!isOpen);
+  const { isChatBoxOpen, chatBoxActiveTab, message, messageContext } = state;
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    if (!message.trim()) return;
 
-    const newMessage = { text: input, sender: "user", timestamp: new Date() };
-    setMessages([...messages, newMessage]);
-    setInput("");
+    const newMessage = { text: message, sender: "user", timestamp: new Date() };
 
-    dispatch(
-      getChatBotData({
-        query: input,
-      })
-    );
+    setState((prevState) => ({
+      ...prevState,
+      message: "",
+      messageContext: [...prevState.messageContext, newMessage],
+    }));
+
+    dispatch(getChatBotData({ query: message }));
 
     setTimeout(() => {
       const botReply = {
@@ -52,148 +47,119 @@ const ChatBot = () => {
         sender: "bot",
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, botReply]);
+
+      setState((prevState) => ({
+        ...prevState,
+        messageContext: [...prevState.messageContext, botReply],
+      }));
     }, 1000);
   };
-
-  // const handleFileChange = (event) => {
-  //   const uploadedFile = event.target.files[0];
-  //   if (uploadedFile) {
-  //     const fileMessage = { text: `📎 ${uploadedFile.name}`, sender: "user", timestamp: new Date() };
-  //     setMessages([...messages, fileMessage]);
-  //   }
-  // };
-
-  // const addEmoji = (emoji) => setInput(input + emoji);
 
   const formatTimestamp = (timestamp) => {
     return new Date(timestamp).toLocaleString();
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEnd.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messageContext]);
 
   return (
-    <div className={styles.chatContainer}>
-      {isOpen && (
-        <div className={styles.chatBox}>
-          <div className={styles.heading}>
-            {activeTab === "chat" ? (
-              <>
-                <IoChatbubbleEllipsesSharp />
-                Chat
-              </>
-            ) : (
-              <>
-                <IoIosHelpCircleOutline className={styles.tabIcon} />
-                Help
-              </>
-            )}
+    <section className="position-fixed bottom-0 start-0 p-3">
+      {isChatBoxOpen && (
+        <div
+          className="d-flex flex-column border rounded shadow bg-white mb-3 justify-content-between"
+          style={{ width: 500, height: 500 }}
+        >
+          <div className="text-center p-2 border-bottom">
+            {chatBoxActiveTab.toUpperCase()}
           </div>
 
-          {activeTab === "chat" && (
-            <div className={styles.chatContent}>
-              <div className={styles.messages}>
-                {messages.map((msg, index) => (
+          {chatBoxActiveTab === "chat" && (
+            <div className="d-flex h-100 flex-column flex-1 overflow-scroll p-2">
+              {messageContext.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`w-100 d-flex align-items-center mb-2 ${
+                    msg.sender === "user"
+                      ? "justify-content-end"
+                      : "justify-content-start"
+                  }`}
+                >
+                  {msg.sender === "bot" && (
+                    <div className="me-2 text-success">
+                      <SmartToyOutlinedIcon />
+                    </div>
+                  )}
                   <div
-                    key={index}
-                    className={`${styles.messageWrapper} ${
+                    className={`p-2 rounded ${
                       msg.sender === "user"
-                        ? styles.userWrapper
-                        : styles.botWrapper
+                        ? "bg-primary text-white border"
+                        : "bg-light border"
                     }`}
                   >
-                    {msg.sender === "user" ? (
-                      <FaUser className={styles.userIcon} />
-                    ) : (
-                      <FaRobot className={styles.botIcon} />
-                    )}
-                    <div
-                      className={`${styles.message} ${
-                        msg.sender === "user"
-                          ? styles.userMessage
-                          : styles.botMessage
-                      }`}
-                    >
-                      {msg.text}
-                      <div className={styles.timestamp}>
-                        {formatTimestamp(msg.timestamp)}
-                      </div>
+                    <span>{msg.text}</span>
+                    <div className="text-end" style={{ fontSize: "0.85rem" }}>
+                      <small>{formatTimestamp(msg.timestamp)}</small>
                     </div>
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className={styles.inputArea}>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message..."
-                  className={styles.input}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      sendMessage();
-                    }
-                  }}
-                />
-                <button onClick={sendMessage} className={styles.sendButton}>
-                  <IoSend className={styles.sendIcon} />
-                </button>
+                  {msg.sender === "user" && (
+                    <div className="me-2 text-primary">
+                      <PersonOutlinedIcon />
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div ref={messagesEnd} />
+            </div>
+          )}
+          {chatBoxActiveTab === "chat" && (
+            <div className="d-flex align-items-center border m-2 mt-0 rounded gap-2 p-2">
+              <input
+                type="text"
+                value={message}
+                placeholder="Type a message..."
+                onChange={(e) =>
+                  setState({ ...state, message: e.target.value })
+                }
+                className="rounded w-100 outline-none border-0"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") sendMessage();
+                }}
+              />
+              <div onClick={sendMessage} className="cursor-pointer">
+                <SendRoundedIcon />
               </div>
             </div>
           )}
 
-          {activeTab === "help" && (
-            <div className={styles.helpContent}>
-              <p>Need help? Check out these resources:</p>
-              <ul>
-                <li>
-                  <a
-                    href="https://example.com/help1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://example.com/contact"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Contact Support
-                  </a>
-                </li>
-              </ul>
-            </div>
+          {chatBoxActiveTab === "help" && (
+            <div className="d-flex flex-column h-100 flex-1 overflow-scroll p-2"></div>
           )}
 
-          <div className={styles.tabs}>
-            <button
-              className={activeTab === "chat" ? styles.activeTab : styles.tab}
-              onClick={() => setActiveTab("chat")}
-            >
-              <RiHome6Fill className={styles.tabIcon} />
-            </button>
-            <button
-              className={activeTab === "help" ? styles.activeTab : styles.tab}
-              onClick={() => setActiveTab("help")}
-            >
-              <IoIosHelpCircleOutline className={styles.tabIcon} />
-            </button>
+          <div className="d-flex justify-content-center gap-2 border-top">
+            {[
+              { key: "chat", icon: <HomeOutlinedIcon /> },
+              { key: "help", icon: <ContactSupportOutlinedIcon /> },
+            ].map(({ key, icon }) => (
+              <button
+                key={key}
+                className={`w-100 border-0 outline-0 bg-white py-3
+                  ${chatBoxActiveTab === key ? "text-dark" : "text-muted"}`}
+                onClick={() => setState({ ...state, chatBoxActiveTab: key })}
+              >
+                {icon}
+              </button>
+            ))}
           </div>
         </div>
       )}
-
-      <button className={styles.searchButton} onClick={toggleChatBox}>
-        <FaSearch className={styles.searchIcon} /> Search
+      <button
+        className="btn btn-primary d-flex gap-1 align-items-center"
+        onClick={() => setState({ ...state, isChatBoxOpen: !isChatBoxOpen })}
+      >
+        <SearchOutlinedIcon />
+        <span>Search</span>
       </button>
-    </div>
+    </section>
   );
-};
-
-export default ChatBot;
+}
