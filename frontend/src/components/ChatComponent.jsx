@@ -105,6 +105,9 @@ export default function ChatBot() {
     }
   };
 
+  // API_HOST_URL + "/vector/query-helps";
+  // payload: { query: message }
+
   return (
     <section className="position-fixed bottom-0 start-0 p-3">
       {isChatBoxOpen && (
