@@ -1,5 +1,5 @@
 import winston from "winston";
-import { env } from "../constants/constants";
+import { env } from "../constants/constants.js";
 
 const levels = {
   error: 0,

@@ -1,7 +1,7 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database/mysql");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../database/mysql.js";
 
-const CreateSkillDevelopmentPlan = sequelize.define(
+export const CreateSkillDevelopmentPlan = sequelize.define(
   "CreateSkillDevelopmentPlan",
   {
     id: {
@@ -110,5 +110,3 @@ const CreateSkillDevelopmentPlan = sequelize.define(
     ],
   }
 );
-
-module.exports = CreateSkillDevelopmentPlan;

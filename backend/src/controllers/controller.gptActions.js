@@ -1,10 +1,8 @@
-const {
-  UserMetaName,
-  CallMetaData,
-  CreateSkillDevelopmentPlan,
-  UserSkillDevPlanMapping,
-} = require("../models");
-const { Op } = require("sequelize");
+import { UserMetaName } from "../models/model.userMetaNames.js";
+import { CallMetaData } from "../models/model.callMetaData.js";
+import { CreateSkillDevelopmentPlan } from "../models/model.createSkillDevPlan.js";
+import UserSkillDevPlanMapping from "../models/model.userSkillDevPlanMapping.js";
+import { Op } from "sequelize";
 
 export async function getDevPlan(
   agentName,
@@ -46,17 +44,6 @@ export async function getDevPlan(
     console.error("Error retrieving user skill development plans:", error);
     throw error;
   }
-  // return {
-  //   devPlans: [
-  //     {
-  //       id: 1,
-  //       agentName: agentName,
-  //       monthStartDate: monthStartDate,
-  //       monthEndDate: monthEndDate,
-  //       planName: "Plan 1",
-  //     },
-  //   ],
-  // };
 }
 
 export async function getCalls(agentName, startDate, endDate, brandId = 40) {
@@ -92,13 +79,4 @@ export async function getCalls(agentName, startDate, endDate, brandId = 40) {
     console.error("Error retrieving call data:", error);
     throw error;
   }
-  // return {
-  //   calls: [
-  //     {
-  //       id: 1,
-  //       agentName: agentName,
-  //       callDate: "2025-01-01 00:00:00",
-  //     },
-  //   ],
-  // };
 }

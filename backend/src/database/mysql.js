@@ -1,7 +1,6 @@
 import { Sequelize } from "sequelize";
-import { sqlCredentials } from "../constants/constants";
-
-const logger = require("../utils/logger");
+import { sqlCredentials } from "../constants/constants.js";
+import { logger } from "../utils/logger.js";
 
 export const sequelize = new Sequelize(
   sqlCredentials.database,

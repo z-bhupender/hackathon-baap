@@ -1,7 +1,7 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database/mysql");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../database/mysql.js";
 
-const UserMetaName = sequelize.define(
+export const UserMetaName = sequelize.define(
   "UserMetaName",
   {
     id: {
@@ -72,4 +72,3 @@ const UserMetaName = sequelize.define(
   }
 );
 
-module.exports = UserMetaName;

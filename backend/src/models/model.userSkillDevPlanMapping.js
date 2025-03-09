@@ -1,6 +1,6 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database/mysql");
-const CreateSkillDevelopmentPlan = require("./model.createSkillDevPlan");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../database/mysql.js";
+import { CreateSkillDevelopmentPlan } from "./model.createSkillDevPlan.js";
 
 const UserSkillDevPlanMapping = sequelize.define(
   "UserSkillDevPlanMapping",
@@ -152,4 +152,4 @@ UserSkillDevPlanMapping.belongsTo(CreateSkillDevelopmentPlan, {
   onUpdate: "CASCADE",
 });
 
-module.exports = UserSkillDevPlanMapping;
+export default UserSkillDevPlanMapping;
