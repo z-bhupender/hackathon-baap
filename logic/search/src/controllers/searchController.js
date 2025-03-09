@@ -46,7 +46,7 @@ export async function search(req, res) {
         $vectorSearch: {
           queryVector: embeddings,
           path: "title_embedding",
-          numCandidates: 30, // Reduce from 100 → 30
+          numCandidates: 20,
           limit: 5,
           index: "default",
         },
@@ -135,6 +135,36 @@ export async function insert(req, res) {
     res.json({
       success: true,
       message: "Data Inserted Successfully",
+      error: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+}
+
+export async function list(_, res) {
+  try {
+    let helps = await Help.find({}).select("title content module -_id");
+
+    let groupedHelps = helps.reduce((acc, help) => {
+      if (!acc[help.module]) {
+        acc[help.module] = [];
+      }
+      acc[help.module].push({
+        title: help.title,
+        content: help.content,
+      });
+      return acc;
+    }, {});
+
+    res.json({
+      success: true,
+      data: groupedHelps,
+      message: "Data Fetched Successfully",
       error: null,
     });
   } catch (error) {
