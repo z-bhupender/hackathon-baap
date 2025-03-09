@@ -7,9 +7,6 @@ function* getChatBotData(action) {
   try {
     const url = API_HOST_URL + "/vector/query-helps";
 
-    console.log("URL: ", url);
-    
-
     const response = yield fetch(url, {
       method: "POST",
       headers: {
