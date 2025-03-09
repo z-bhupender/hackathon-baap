@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "./ChatBot.module.css";
 import { FaSearch, FaPaperclip, FaSmile, FaUser, FaRobot } from "react-icons/fa";
-import { use } from "react";
+
 import { useDispatch } from "react-redux";
+import { getChatBotData } from "../store/actions/chatBotActions/chatBotactions";
 
 const ChatBot = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const ChatBot = () => {
 
 
   useEffect(()=>{
-    dispatch(getChatBotData("hhhhh"))
+    dispatch(getChatBotData(input))
   },[])
 
   const toggleChatBox = () => setIsOpen(!isOpen);
@@ -29,6 +30,10 @@ const ChatBot = () => {
     const newMessage = { text: input, sender: "user", timestamp: new Date() };
     setMessages([...messages, newMessage]);
     setInput("");
+
+    dispatch(getChatBotData({
+      query:input
+    }))
 
     setTimeout(() => {
       const botReply = { text: "I'm here to assist you!", sender: "bot", timestamp: new Date() };
