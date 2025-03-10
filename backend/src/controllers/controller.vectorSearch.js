@@ -78,9 +78,21 @@ export async function search(req, res) {
       delete help.score;
     });
 
+    let groupedHelps = helps.reduce((acc, help) => {
+      let module_name = toTitleCase(help.module.replaceAll("_", " "));
+      if (!acc[module_name]) {
+        acc[module_name] = [];
+      }
+      acc[module_name].push({
+        title: help.title,
+        content: help.content,
+      });
+      return acc;
+    }, {});
+
     res.json({
       success: true,
-      data: helps,
+      data: groupedHelps,
       message: "Data Fetched Successfully",
       error: null,
     });

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { API_HOST_URL } from "../constants/constants";
 import { useDispatch } from "react-redux";
+import { API_HOST_URL } from "../constants/constants";
 import React, { useState, useRef, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
@@ -105,8 +105,25 @@ export default function ChatBot() {
     }
   };
 
-  // API_HOST_URL + "/vector/query-helps";
-  // payload: { query: message }
+  const debouncedSearchHelp = useRef(null);
+
+  useEffect(() => {
+    if (!searchHelp) return;
+    debouncedSearchHelp.current = setTimeout(() => {
+      const url = API_HOST_URL + "/vector/query-helps";
+      axios
+        .post(url, { query: searchHelp })
+        .then((response) => {
+          setState((prevState) => ({
+            ...prevState,
+            helps: response.data.data,
+          }));
+        })
+        .catch((error) => {
+          console.error("API call failed:", error);
+        });
+    }, 1000);
+  }, [searchHelp]);
 
   return (
     <section className="position-fixed bottom-0 start-0 p-3">
@@ -117,7 +134,10 @@ export default function ChatBot() {
         >
           <div className="text-center p-2 border-bottom position-relative">
             {selectedDashboard || selectedQuestion ? (
-              <button onClick={goBack} className="btn btn-link p-0 me-2 position-fixed start-0 ms-4">
+              <button
+                onClick={goBack}
+                className="btn btn-link p-0 me-2 position-fixed start-0 ms-4"
+              >
                 <ArrowBackIcon />
               </button>
             ) : null}
