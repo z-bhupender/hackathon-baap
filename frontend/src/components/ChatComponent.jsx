@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import { getChatBotData } from "../store/actions/chatBotActions";
+import { getChatBotData, getGPTData } from "../store/actions/chatBotActions";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
@@ -23,8 +23,8 @@ export default function ChatBot() {
     message: "",
     messageContext: [
       {
-        text: "Hello! How can I help you?",
-        sender: "bot",
+        content: "Hello! How can I help you?",
+        role: "assistant",
         timestamp: new Date(),
       },
     ],
@@ -65,7 +65,11 @@ export default function ChatBot() {
   const sendMessage = () => {
     if (!message.trim()) return;
 
-    const newMessage = { text: message, sender: "user", timestamp: new Date() };
+    const newMessage = {
+      content: message,
+      role: "user",
+      timestamp: new Date(),
+    };
 
     setState((prevState) => ({
       ...prevState,
@@ -73,20 +77,65 @@ export default function ChatBot() {
       messageContext: [...prevState.messageContext, newMessage],
     }));
 
-    dispatch(getChatBotData({ query: message }));
+    // Create messageContext for request
+    let requestMessageContext = messageContext
+      .map((message) => {
+        return {
+          role: message.role,
+          content: message.content,
+        };
+      })
+      .slice(1);
+    requestMessageContext.push({
+      content: message,
+      role: "user",
+    });
+    if (
+      requestMessageContext.length !== 0 &&
+      requestMessageContext[requestMessageContext.length - 1].role ===
+        "function"
+    ) {
+      requestMessageContext = [];
+    }
 
-    setTimeout(() => {
-      const botReply = {
-        text: "I'm here to assist you!",
-        sender: "bot",
-        timestamp: new Date(),
-      };
-
-      setState((prevState) => ({
-        ...prevState,
-        messageContext: [...prevState.messageContext, botReply],
-      }));
-    }, 1000);
+    const url = API_HOST_URL + "/function-call/help";
+    axios
+      .post(url, { messages: requestMessageContext })
+      .then((response) => {
+        let message = response.data;
+        if (message.role === "function") {
+          if (message.name === "getCalls") {
+            message = {
+              role: "assistant",
+              content: `Call IDs for the given agent are: ${message.content
+                .map((call) => call.callid)
+                .join(", \n")}`,
+            };
+          }
+        }
+        setState((prevState) => ({
+          ...prevState,
+          messageContext: [
+            ...prevState.messageContext,
+            { ...message, timestamp: new Date().toLocaleString() },
+          ],
+          message: "",
+        }));
+      })
+      .catch((error) => {
+        console.error("API call failed:", error);
+        setState((prevState) => ({
+          ...prevState,
+          messageContext: [
+            ...prevState.messageContext,
+            {
+              role: "assistant",
+              content: "Something went wrong. Please try again.",
+              timestamp: new Date().toLocaleString(),
+            },
+          ],
+        }));
+      });
   };
 
   const formatTimestamp = (timestamp) => {
@@ -117,7 +166,7 @@ export default function ChatBot() {
           setState((prevState) => ({
             ...prevState,
             helps: response?.data?.data,
-            searchHelp: ""
+            searchHelp: "",
           }));
         })
         .catch((error) => {
@@ -151,29 +200,29 @@ export default function ChatBot() {
                 <div
                   key={index}
                   className={`w-100 d-flex align-items-center mb-2 ${
-                    msg.sender === "user"
+                    msg.role === "user"
                       ? "justify-content-end"
                       : "justify-content-start"
                   }`}
                 >
-                  {msg.sender === "bot" && (
+                  {msg.role === "assistant" && (
                     <div className="me-2 text-success">
                       <SmartToyOutlinedIcon />
                     </div>
                   )}
                   <div
                     className={`p-2 mw-70 rounded ${
-                      msg.sender === "user"
+                      msg.role === "user"
                         ? "bg-primary text-white border"
                         : "bg-light border"
                     }`}
                   >
-                    <span>{msg.text}</span>
+                    <span>{msg.content}</span>
                     <div className="text-end" style={{ fontSize: "0.85rem" }}>
                       <small>{formatTimestamp(msg.timestamp)}</small>
                     </div>
                   </div>
-                  {msg.sender === "user" && (
+                  {msg.role === "user" && (
                     <div className="me-2 text-primary">
                       <PersonOutlinedIcon />
                     </div>
