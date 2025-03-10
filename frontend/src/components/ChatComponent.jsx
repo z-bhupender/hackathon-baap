@@ -116,7 +116,8 @@ export default function ChatBot() {
         .then((response) => {
           setState((prevState) => ({
             ...prevState,
-            helps: response.data.data,
+            helps: response?.data?.data,
+            searchHelp: ""
           }));
         })
         .catch((error) => {
