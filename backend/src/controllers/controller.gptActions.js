@@ -15,11 +15,36 @@ export async function getDevPlan(
   try {
     const results = await UserSkillDevPlanMappingModel.findAll({
       attributes: [
-        "id",
-        "user_plan_display_name",
-        "user_id",
-        "user_name",
-        "role",
+        [
+          UserSkillDevPlanMappingModel.sequelize.col(
+            "UserSkillDevPlanMapping.id"
+          ),
+          "id",
+        ],
+        [
+          UserSkillDevPlanMappingModel.sequelize.col(
+            "UserSkillDevPlanMapping.user_plan_display_name"
+          ),
+          "user_plan_display_name",
+        ],
+        [
+          UserSkillDevPlanMappingModel.sequelize.col(
+            "UserSkillDevPlanMapping.user_id"
+          ),
+          "user_id",
+        ],
+        [
+          UserSkillDevPlanMappingModel.sequelize.col(
+            "UserSkillDevPlanMapping.user_name"
+          ),
+          "user_name",
+        ],
+        [
+          UserSkillDevPlanMappingModel.sequelize.col(
+            "UserSkillDevPlanMapping.role"
+          ),
+          "role",
+        ],
       ],
       include: [
         {
