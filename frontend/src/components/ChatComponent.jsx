@@ -107,9 +107,8 @@ export default function ChatBot() {
           if (message.name === "getCalls") {
             message = {
               role: "assistant",
-              content: `Call IDs for the given agent are: ${message.content
-                .map((call) => call.callid)
-                .join(", \n")}`,
+              content: "Call IDs for the given agent are: ",
+              list: message.content.map((call) => call.callid),
             };
           }
         }
@@ -218,6 +217,15 @@ export default function ChatBot() {
                     }`}
                   >
                     <span>{msg.content}</span>
+                    {msg.role === "assistant" && msg.list && (
+                      <div className="mt-2">
+                        <ul>
+                          {msg.list.map((call, index) => (
+                            <li key={index}>{call}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     <div className="text-end" style={{ fontSize: "0.85rem" }}>
                       <small>{formatTimestamp(msg.timestamp)}</small>
                     </div>
